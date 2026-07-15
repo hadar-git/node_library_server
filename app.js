@@ -10,7 +10,21 @@ app.get('/', (req, res) => {
 })
 
 app.get('/books', (req, res) => {
-  res.status(200).send(books);
+
+     const { limit = '10', page= '1' , name = ''} = req.query;
+     const filtered = books.filter(book =>  book.name.includes(name));
+     const startIndex = limit * (page - 1);
+     const resu = filtered.slice(startIndex, startIndex + limit);
+
+
+  if(resu){
+      res.status(200).json(resu);
+  }
+  else{
+ 
+   res.status(400).json('errrrr');
+ 
+  }
 })
 
 
@@ -34,7 +48,7 @@ app.post('/books/', (req, res) => {
  res.status(201).send(req.body);
 
 })
-g
+
 
 app.put('/books/:id', (req, res) => {
      const b= books.find(book => Number(book.code) === Number(req.params.id)) 
