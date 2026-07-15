@@ -15,6 +15,7 @@ app.get('/books', (req, res) => {
 
 
 app.get('/books/:id', (req, res) => {
+<<<<<<< HEAD
     let b=books.find(book => Number(book.code) === Number(req.params.id));
     if(b)
     {
@@ -23,14 +24,37 @@ res.status(200).send(b );
  else{
     res.status(404).send("errorrrrrr");
  }
+=======
+ res.status(200).send(books.find(book => Number(book.code) === Number(req.params.id)) );
+>>>>>>> 8582a34b01cccffdfd482e0c17360622a8787a7a
 })
 
 
 app.post('/books/', (req, res) => {
+<<<<<<< HEAD
     books.push(req.body)
  res.status(201).send(req.body);
+=======
+
+ res.status(200).send(books.push(req.body));
+>>>>>>> 8582a34b01cccffdfd482e0c17360622a8787a7a
 })
 g
+
+app.put('/books/:id', (req, res) => {
+     const b= books.find(book => Number(book.code) === Number(req.params.id)) 
+if(b)
+{
+   b.name= req.body.name;
+    b.category=req.body.category;
+    b.price= req.body.price;
+ res.status(200).send(b);
+}
+else{
+     res.status(404).send("error");
+}
+
+});
 
 app.put('/books/:id', (req, res) => {
      const b= books.find(book => Number(book.code) === Number(req.params.id)) 
@@ -53,8 +77,12 @@ app.patch('/books/:id/borrow', (req, res) => {
     if( b && b.isBorrowed ==false  )
     {
         b.isBorrowed=true;
+<<<<<<< HEAD
         b.loans.push({ borrowDate: new Date(), customerCode: req.body.customerCode })
         res.status(200).send(b);
+=======
+        res.status(200).send(b.loans.push({ borrowDate: new Date(), customerCode: req.body.customerCode }));
+>>>>>>> 8582a34b01cccffdfd482e0c17360622a8787a7a
     }
     else{
         res.status(404).send('already in use');
