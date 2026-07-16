@@ -2,43 +2,62 @@ import {books} from '../index.js'
 
 
  export const getAllBooks = (req, res, next) => {
-
+try {
      const { limit = '10', page= '1' , name = ''} = req.query;
      const filtered = books.filter(book =>  book.name.includes(name));
      const startIndex = limit * (page - 1);
      const resu = filtered.slice(startIndex, startIndex + limit);
-
-
-  if(resu){
+ 
       res.status(200).json(resu);
-  }
-  else{
- 
-   res.status(400).json('errrrr');
- 
-  }
+
+} catch (err) {
+    err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
+}
+    
 }
 
 export const getBookByID = (req, res, next) => {
-let b=books.find(book => Number(book.code) === Number(req.params.id));
-    if(b)
-    {
-res.status(200).send(b );
+    try {
+        let b=books.find(book => Number(book.code) === Number(req.params.id));
+
+if(b)
+{
+     res.status(200).send(b );
+}
+       
+else{
+        const err = new Error('could not find it');
+    err.status = 404; 
+    err.type = 'not found';
+    next(err);
+}
+    } catch (err) {
+         err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
     }
- else{
-    res.status(404).send("errorrrrrr");
- }
+
 }
 
  export const addBook = (req, res, next) => { 
-
-    books.push(req.body)
+try {
+      books.push(req.body)
  res.status(201).send(req.body);
+} catch (err) {
+     err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
+}
+  
 }
 
 export const updateBook = (req, res, next) => {
 
-         const b= books.find(book => Number(book.code) === Number(req.params.id)) 
+
+    try {
+   const b= books.find(book => Number(book.code) === Number(req.params.id)) 
     if(b)
     {
        b.name= req.body.name;
@@ -47,15 +66,36 @@ export const updateBook = (req, res, next) => {
      res.status(200).send(b);
     }
     else{
-         res.status(404).send("error");
-    }
-    
+
+   const err = new Error('could not find it');
+    err.status = 404; 
+    err.type = 'not found';
+    next(err);
+    } 
 }
+catch (err) {
+     err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
+} 
+ }
+
+
 export const updateLoaningBook = (req, res, next) => {
 
+
+    try {
+    
     const b= books.find(book => Number(book.code) === Number(req.params.id)) 
 
-    if( b && b.isBorrowed ==false  )
+    if(!b)
+    {
+  const err = new Error('could not find it');
+    err.status = 404; 
+    err.type = 'not found';
+    next(err);
+    }
+    else if(  b.isBorrowed ==false  )
     {
         b.isBorrowed=true;
 
@@ -64,37 +104,75 @@ export const updateLoaningBook = (req, res, next) => {
 
     }
     else{
-        res.status(404).send('already in use');
+      const err = new Error('already in use');
+    err.status = 409; 
+    err.type = 'conflict';
+    next(err);
     }
-
-
+} catch (err) {
+     err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
 }
+}
+
+
 export const updateReturnedBook = (req, res, next) => {
 
-      const b= books.find(book => Number(book.code) === Number(req.params.id)) 
-    
-        if( b && b.isBorrowed ==true  )
+
+    try {
+     const b= books.find(book => Number(book.code) === Number(req.params.id)) 
+     if(!b)
+    {
+  const err = new Error('could not find it');
+    err.status = 404; 
+    err.type = 'not found';
+    next(err);
+    }
+    else if(b.isBorrowed ==true  )
         {
         console.log("returned");
-        
-            res.status(200).send( b.isBorrowed=false);
+        b.isBorrowed=false
+            res.status(200).send(b );
         }
         else{
-            res.status(404).send('no idea');
+             const err = new Error('not borrowed');
+    err.status = 409; 
+    err.type = 'conflict';
+    next(err);
         }
+} catch (err) {
+     err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
 }
+     
+}
+
+
 export const deleteBook = (req, res, next) => {
 
-     const index = books.findIndex(book => Number(book.code) === Number(req.params.id));
+
+    try {
+      const index = books.findIndex(book => Number(book.code) === Number(req.params.id));
 
 
     if(index!==-1)
    {
-    console.log("ddd");
+    console.log("deleted");
   
         res.status(200).send( books.splice(index, 1));
     }
     else{
-        res.status(404).send('not found');
+       const err = new Error('not found');
+    err.status = 404; 
+    err.type = 'not found';
+    next(err);  
     }
+} catch (err) {
+     err.status = 500;        
+        err.type = 'server error'; 
+        next(err);
+}
+   
 }
